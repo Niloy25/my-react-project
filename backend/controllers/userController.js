@@ -17,7 +17,7 @@ const getMe = async (req, res, next) => {
 };
 
 // ── Update own profile ────────────────────────────────────
-// PUT /api/users/me  (Private)
+// PUT /api/users/me (Private)
 const updateMe = async (req, res, next) => {
   try {
     if (req.body.password) {
