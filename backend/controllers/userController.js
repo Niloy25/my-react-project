@@ -3,7 +3,7 @@ const AppError = require("../utils/AppError");
 const logger = require("../config/logger");
 
 // ── Get own profile ───────────────────────────────────────
-// GET /api/users/me  (Private)
+// GET /api/users/me (Private)
 const getMe = async (req, res, next) => {
   try {
     // req.user already attached by protect middleware
