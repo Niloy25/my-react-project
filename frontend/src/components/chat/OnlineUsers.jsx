@@ -1,4 +1,3 @@
-import React from "react";
 import useSocket from "../../hooks/useSocket";
 import { Users } from "lucide-react";
 
