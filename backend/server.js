@@ -6,6 +6,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const path = require("path");
+const fs = require("fs");
 
 const connectDB = require("./config/db");
 const logger = require("./config/logger");
@@ -34,6 +36,14 @@ app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Create uploads folder if it doesn't exist on startup
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+// Serve uploads statically
+app.use("/uploads", express.static(uploadsDir));
+
 // ── HTTP Logging ──────────────────────────────────────────
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -57,6 +67,7 @@ app.get("/health", (_req, res) => {
 // ── API Routes ────────────────────────────────────────────
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/uploads", require("./routes/uploadRoutes"));
 
 // ── 404 ───────────────────────────────────────────────────
 app.use((_req, res) => {

@@ -12,6 +12,10 @@ export default {
           700: "#1d4ed8",
         },
       },
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+        heading: ["Inter", "system-ui", "sans-serif"],
+      },
     },
   },
   plugins: [],

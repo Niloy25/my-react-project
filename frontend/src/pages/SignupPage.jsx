@@ -2,10 +2,33 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import { useAuth } from "../context/AuthContext";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useAuth } from "../hooks/useAuth";
+import Input from "../components/ui/Input";
+import Button from "../components/ui/Button";
 import toast from "react-hot-toast";
 
-// Password strength checker
+// Zod Schema
+const signupSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name is too long"),
+
+  email: z.string().trim().email("Please enter a valid email address"),
+
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password needs an uppercase letter")
+    .regex(/[0-9]/, "Password needs a number")
+    .regex(/[!@#$%^&*]/, "Password needs a special character (!@#$%^&*)")
+    .max(128, "Password is too long"),
+});
+
+// Keep the password strength helper
 const getPasswordStrength = (password) => {
   let score = 0;
   if (password.length >= 8) score++;
@@ -35,10 +58,9 @@ const SignupPage = () => {
     register,
     handleSubmit,
     watch,
-    setError,
-    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -49,31 +71,6 @@ const SignupPage = () => {
 
   const passwordValue = watch("password");
   const strength = getPasswordStrength(passwordValue || "");
-
-  const validateForm = (data) => {
-    const validationErrors = {};
-
-    if (!data.name.trim() || data.name.length < 2) {
-      validationErrors.name = "Name must be at least 2 characters";
-    }
-
-    if (!data.email || !/^\S+@\S+\.\S+$/.test(data.email)) {
-      validationErrors.email = "Please enter a valid email";
-    }
-
-    if (!data.password || data.password.length < 8) {
-      validationErrors.password = "Password must be at least 8 characters";
-    } else if (!/[A-Z]/.test(data.password)) {
-      validationErrors.password = "Password needs an uppercase letter";
-    } else if (!/[0-9]/.test(data.password)) {
-      validationErrors.password = "Password needs a number";
-    } else if (!/[!@#$%^&*]/.test(data.password)) {
-      validationErrors.password =
-        "Password needs a special character (!@#$%^&*)";
-    }
-
-    return validationErrors;
-  };
 
   const mutation = useMutation({
     mutationFn: (formData) =>
@@ -90,7 +87,8 @@ const SignupPage = () => {
 
       if (apiErrors) {
         apiErrors.forEach(({ field, message }) => {
-          setError(field, { type: "manual", message });
+          // You can still manually set errors from API if needed
+          // (Zod errors are already handled by the form)
         });
       } else {
         toast.error(msg);
@@ -99,16 +97,6 @@ const SignupPage = () => {
   });
 
   const onSubmit = async (data) => {
-    const validationErrors = validateForm(data);
-
-    if (Object.keys(validationErrors).length > 0) {
-      Object.entries(validationErrors).forEach(([field, message]) => {
-        setError(field, { type: "manual", message });
-      });
-      return;
-    }
-
-    clearErrors();
     mutation.mutate(data);
   };
 
@@ -125,65 +113,45 @@ const SignupPage = () => {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                {...register("name")}
-                placeholder="John Doe"
-                className={`input ${errors.name ? "border-red-400 focus:ring-red-400" : ""}`}
-              />
-              {errors.name && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
+            <Input
+              label="Full Name"
+              type="text"
+              placeholder="John Doe"
+              error={errors.name?.message}
+              {...register("name")}
+            />
 
             {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                {...register("email")}
-                placeholder="john@example.com"
-                className={`input ${errors.email ? "border-red-400 focus:ring-red-400" : ""}`}
-              />
-              {errors.email && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
+            <Input
+              label="Email"
+              type="email"
+              placeholder="john@example.com"
+              error={errors.email?.message}
+              {...register("email")}
+            />
 
             {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPass ? "text" : "password"}
-                  {...register("password")}
-                  placeholder="Min 8 chars, uppercase, number, symbol"
-                  className={`input pr-10 ${errors.password ? "border-red-400 focus:ring-red-400" : ""}`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs font-medium"
-                >
-                  {showPass ? "Hide" : "Show"}
-                </button>
-              </div>
+            <div className="space-y-2">
+              <Input
+                label="Password"
+                type={showPass ? "text" : "password"}
+                placeholder="Min 8 chars, uppercase, number, symbol"
+                error={errors.password?.message}
+                {...register("password")}
+                suffix={
+                  <button
+                    type="button"
+                    onClick={() => setShowPass(!showPass)}
+                    className="text-gray-400 hover:text-gray-600 text-xs font-medium focus:outline-none"
+                  >
+                    {showPass ? "Hide" : "Show"}
+                  </button>
+                }
+              />
 
               {/* Password strength bar */}
               {passwordValue && (
-                <div className="mt-2">
+                <div className="mt-2 text-left">
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map((i) => (
                       <div
@@ -209,29 +177,16 @@ const SignupPage = () => {
                   </p>
                 </div>
               )}
-
-              {errors.password && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors.password.message}
-                </p>
-              )}
             </div>
 
             {/* Submit Button */}
-            <button
+            <Button
               type="submit"
-              disabled={isSubmitting || mutation.isPending}
-              className="btn-primary mt-2 w-full"
+              isLoading={isSubmitting || mutation.isPending}
+              className="mt-2 w-full"
             >
-              {isSubmitting || mutation.isPending ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Creating account...
-                </span>
-              ) : (
-                "Create Account"
-              )}
-            </button>
+              {isSubmitting || mutation.isPending ? "Creating account..." : "Create Account"}
+            </Button>
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">

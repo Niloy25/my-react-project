@@ -38,6 +38,18 @@ const signupLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Refresh: max 30 requests per 15 minutes per IP
+const refreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: {
+    success: false,
+    message: "Too many token refresh requests. Please try again later.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // ── Validation rules ───────────────────────────────────────────────────────
 const signupRules = [
   body("name")
@@ -91,6 +103,6 @@ router.post("/login", loginLimiter, loginRules, validate, login);
 router.post("/logout", protect, logout);
 
 // POST /api/auth/refresh
-router.post("/refresh", refreshToken);
+router.post("/refresh", refreshLimiter, refreshToken);
 
 module.exports = router;

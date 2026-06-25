@@ -16,7 +16,10 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^S+@S+.S+$/, "Please enter a valid email"],
+      match: [
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        "Please enter a valid email",
+      ],
     },
     password: {
       type: String,
@@ -28,6 +31,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["user", "admin"],
       default: "user",
+    },
+    profilePicture: {
+      type: String,
+      default: "",
     },
     isVerified: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
@@ -58,11 +65,10 @@ userSchema.virtual("initials").get(function () {
     .slice(0, 2);
 });
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {

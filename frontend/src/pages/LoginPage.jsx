@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
+import Input from "../components/ui/Input";
+import Button from "../components/ui/Button";
 import toast from "react-hot-toast";
 
 const LoginPage = () => {
@@ -76,65 +78,40 @@ const LoginPage = () => {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                {...register("email")}
-                placeholder="john@example.com"
-                className={`input ${errors.email ? "border-red-400 focus:ring-red-400" : ""}`}
-              />
-              {errors.email && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
+            <Input
+              label="Email"
+              type="email"
+              placeholder="john@example.com"
+              error={errors.email?.message}
+              {...register("email")}
+            />
 
             {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPass ? "text" : "password"}
-                  {...register("password")}
-                  placeholder="Your password"
-                  className={`input pr-10 ${errors.password ? "border-red-400 focus:ring-red-400" : ""}`}
-                />
+            <Input
+              label="Password"
+              type={showPass ? "text" : "password"}
+              placeholder="Your password"
+              error={errors.password?.message}
+              {...register("password")}
+              suffix={
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs font-medium"
+                  className="text-gray-400 hover:text-gray-600 text-xs font-medium focus:outline-none"
                 >
                   {showPass ? "Hide" : "Show"}
                 </button>
-              </div>
-              {errors.password && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
+              }
+            />
 
             {/* Submit */}
-            <button
+            <Button
               type="submit"
-              disabled={isSubmitting || mutation.isPending}
-              className="btn-primary mt-2 w-full"
+              isLoading={isSubmitting || mutation.isPending}
+              className="mt-2 w-full"
             >
-              {isSubmitting || mutation.isPending ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Signing in...
-                </span>
-              ) : (
-                "Sign In"
-              )}
-            </button>
+              {isSubmitting || mutation.isPending ? "Signing in..." : "Sign In"}
+            </Button>
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">

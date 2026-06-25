@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { AuthProvider } from "./context/AuthContext";
 
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
@@ -11,7 +10,6 @@ import DashboardPage from "./pages/DashboardPage";
 const App = () => {
   return (
     <BrowserRouter>
-      <AuthProvider>
         {/* Global toast notifications */}
         <Toaster
           position="top-right"
@@ -53,7 +51,6 @@ const App = () => {
             }
           />
         </Routes>
-      </AuthProvider>
     </BrowserRouter>
   );
 };

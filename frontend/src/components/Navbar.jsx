@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
 
 const Navbar = () => {
@@ -31,17 +31,25 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           {isAuthenticated && user ? (
             <>
-              {/* Avatar with initials */}
-              <div className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-semibold">
-                {user.name
-                  ? user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()
-                      .slice(0, 2)
-                  : "U"}
-              </div>
+              {/* Avatar image or initials */}
+              {user.profilePicture ? (
+                <img
+                  src={user.profilePicture}
+                  alt={user.name}
+                  className="w-8 h-8 rounded-full object-cover border border-gray-250"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-semibold">
+                  {user.name
+                    ? user.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()
+                        .slice(0, 2)
+                    : "U"}
+                </div>
+              )}
 
               {/* User name */}
               <span className="text-sm text-gray-700 font-medium hidden sm:block">
