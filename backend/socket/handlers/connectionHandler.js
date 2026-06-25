@@ -31,11 +31,25 @@ const connectionHandler = (io, socket, onlineUsers) => {
     logger.info(`User came online: ${userName} (${userId})`);
   }
 
-  // Send current online users list to the newly connected socket
-  const onlineList = Array.from(onlineUsers.keys()).map((id) => ({
-    userId: id,
-    socketCount: onlineUsers.get(id).size,
-  }));
+  // Send current online users list with details to the newly connected socket
+  const onlineList = [];
+  for (const [id, socketIds] of onlineUsers.entries()) {
+    const firstSocketId = Array.from(socketIds)[0];
+    const userSocket = io.sockets.sockets.get(firstSocketId);
+    if (userSocket && userSocket.user) {
+      onlineList.push({
+        userId: id,
+        name: userSocket.user.name,
+        avatar: userSocket.user.profilePicture || "",
+      });
+    } else {
+      onlineList.push({
+        userId: id,
+        name: "User",
+        avatar: "",
+      });
+    }
+  }
 
   socket.emit("online:users", {
     users: onlineList,

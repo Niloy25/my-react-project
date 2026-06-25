@@ -7,6 +7,8 @@ import SingleFileUpload from "../components/upload/SingleFileUpload";
 import MultipleFileUpload from "../components/upload/MultipleFileUpload";
 import api from "../utils/axios";
 import toast from "react-hot-toast";
+import ChatRoom from "../components/chat/ChatRoom";
+import OnlineUsers from "../components/chat/OnlineUsers";
 
 const DashboardPage = () => {
   const { user, logout, updateUser } = useAuth();
@@ -121,6 +123,16 @@ const DashboardPage = () => {
                 <span className="text-2xl">✓</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Real-time Socket Playground */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10 items-start">
+          <div className="lg:col-span-3">
+            <ChatRoom />
+          </div>
+          <div className="lg:col-span-1">
+            <OnlineUsers />
           </div>
         </div>
 

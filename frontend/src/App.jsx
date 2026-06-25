@@ -6,10 +6,12 @@ import PrivateRoute from "./components/PrivateRoute";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
+import { SocketProvider } from "./context/SocketContext";
 
 const App = () => {
   return (
     <BrowserRouter>
+      <SocketProvider>
         {/* Global toast notifications */}
         <Toaster
           position="top-right"
@@ -51,6 +53,7 @@ const App = () => {
             }
           />
         </Routes>
+      </SocketProvider>
     </BrowserRouter>
   );
 };
