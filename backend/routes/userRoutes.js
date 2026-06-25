@@ -51,9 +51,6 @@ const changePasswordRules = [
 router.use(protect);
 
 // ── Routes ─────────────────────────────────────────────────
-router.get("/", getMe);
-// wait — /me is the correct path below:
-
 router.get("/me", getMe);
 router.put("/me", updateMeRules, validate, updateMe);
 router.delete("/me", deleteMe);
