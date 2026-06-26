@@ -1,4 +1,5 @@
 const logger = require("../../config/logger");
+const Message = require("../../models/Message");
 
 /**
  * chatHandler
@@ -20,7 +21,7 @@ const logger = require("../../config/logger");
  */
 const chatHandler = (io, socket) => {
   // ── Join Room ───────────────────────────────────────────
-  socket.on("room:join", ({ room }) => {
+  socket.on("room:join", async ({ room }) => {
     if (!room || typeof room !== "string") return;
 
     const roomName = room.trim().toLowerCase().replace(/\s+/g, "-");
@@ -41,6 +42,33 @@ const chatHandler = (io, socket) => {
     });
 
     logger.info(`${socket.user.name} joined room: ${roomName}`);
+
+    // Fetch and send room history to the joining user
+    try {
+      const history = await Message.find({ room: roomName })
+        .populate("sender", "name profilePicture")
+        .sort({ createdAt: 1 })
+        .limit(100);
+
+      const formattedHistory = history.map((msg) => ({
+        id: msg._id.toString(),
+        room: msg.room,
+        message: msg.message,
+        sender: {
+          userId: msg.sender?._id || "deleted",
+          name: msg.sender?.name || "Deleted User",
+          avatar: msg.sender?.profilePicture || "",
+        },
+        timestamp: msg.createdAt.toISOString(),
+      }));
+
+      socket.emit("room:history", {
+        room: roomName,
+        messages: formattedHistory,
+      });
+    } catch (error) {
+      logger.error(`Failed to load chat history for ${roomName}: ${error.message}`);
+    }
   });
 
   // ── Leave Room ──────────────────────────────────────────
@@ -51,7 +79,7 @@ const chatHandler = (io, socket) => {
   });
 
   // ── Send Message ────────────────────────────────────────
-  socket.on("message:send", ({ room, message }) => {
+  socket.on("message:send", async ({ room, message }) => {
     if (!room || !message) return;
     if (typeof message !== "string") return;
 
@@ -66,22 +94,36 @@ const chatHandler = (io, socket) => {
       return;
     }
 
-    const payload = {
-      id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      room,
-      message: trimmed,
-      sender: {
-        userId: socket.user._id,
-        name: socket.user.name,
-        avatar: socket.user.profilePicture || "",
-      },
-      timestamp: new Date().toISOString(),
-    };
+    try {
+      const newMessage = new Message({
+        room,
+        sender: socket.user._id,
+        message: trimmed,
+      });
+      await newMessage.save();
 
-    // Send to ALL users in the room including sender
-    io.to(room).emit("message:receive", payload);
+      const payload = {
+        id: newMessage._id.toString(),
+        room,
+        message: trimmed,
+        sender: {
+          userId: socket.user._id,
+          name: socket.user.name,
+          avatar: socket.user.profilePicture || "",
+        },
+        timestamp: newMessage.createdAt.toISOString(),
+      };
 
-    logger.info(`[#${room}] ${socket.user.name}: ${trimmed.slice(0, 50)}`);
+      // Send to ALL users in the room including sender
+      io.to(room).emit("message:receive", payload);
+
+      logger.info(`[#${room}] ${socket.user.name}: ${trimmed.slice(0, 50)}`);
+    } catch (error) {
+      logger.error(`Failed to save message: ${error.message}`);
+      socket.emit("error:message", {
+        message: "Failed to send message. Please try again.",
+      });
+    }
   });
 };
 
