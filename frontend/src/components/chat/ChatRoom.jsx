@@ -2,7 +2,17 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import useSocket from "../../hooks/useSocket";
 import { selectUser } from "../../store/authSlice";
-import { MessageSquare, Send, Info, Globe, Code2, Sparkles, Check, Wifi, WifiOff } from "lucide-react";
+import {
+  MessageSquare,
+  Send,
+  Info,
+  Globe,
+  Code2,
+  Sparkles,
+  Check,
+  Wifi,
+  WifiOff,
+} from "lucide-react";
 import toast from "react-hot-toast";
 
 const AVAILABLE_ROOMS = ["general", "development", "random"];
@@ -159,12 +169,15 @@ export const ChatRoom = () => {
                 <button
                   key={room}
                   onClick={() => setActiveRoom(room)}
-                  className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 transform active:scale-95 ${isActive
-                    ? "bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg shadow-indigo-200/40 scale-[1.02]"
-                    : "text-gray-600 hover:bg-white hover:text-indigo-600 hover:shadow-sm border border-transparent hover:border-gray-100/80"
-                    }`}
+                  className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 transform active:scale-95 ${
+                    isActive
+                      ? "bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg shadow-indigo-200/40 scale-[1.02]"
+                      : "text-gray-600 hover:bg-white hover:text-indigo-600 hover:shadow-sm border border-transparent hover:border-gray-100/80"
+                  }`}
                 >
-                  <IconComponent className={`w-4 h-4 ${isActive ? "text-white" : "text-gray-400"}`} />
+                  <IconComponent
+                    className={`w-4 h-4 ${isActive ? "text-white" : "text-gray-400"}`}
+                  />
                   <span className="truncate">{room}</span>
                 </button>
               );
@@ -176,8 +189,12 @@ export const ChatRoom = () => {
         <div className="bg-white/85 backdrop-blur-md p-3.5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between transition-all duration-300 hover:shadow-md">
           <div className="flex items-center gap-2.5">
             <span className="relative flex h-2.5 w-2.5">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isConnected ? "bg-green-400" : "bg-red-400"}`}></span>
-              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${isConnected ? "bg-green-500" : "bg-red-500"}`}></span>
+              <span
+                className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isConnected ? "bg-green-400" : "bg-red-400"}`}
+              ></span>
+              <span
+                className={`relative inline-flex rounded-full h-2.5 w-2.5 ${isConnected ? "bg-green-500" : "bg-red-500"}`}
+              ></span>
             </span>
             <span className="text-[11px] font-bold text-gray-600">
               {isConnected ? "Sockets Secure" : "Disconnected"}
@@ -197,11 +214,17 @@ export const ChatRoom = () => {
         <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white/80 backdrop-blur-md">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-indigo-50 rounded-xl text-indigo-600 shadow-sm flex items-center justify-center">
-              {React.createElement(ROOM_ICONS[activeRoom] || Globe, { className: "w-5 h-5 text-indigo-600" })}
+              {React.createElement(ROOM_ICONS[activeRoom] || Globe, {
+                className: "w-5 h-5 text-indigo-600",
+              })}
             </div>
             <div>
-              <h3 className="font-extrabold text-gray-800 capitalize leading-none mb-1 text-lg">{activeRoom}</h3>
-              <p className="text-[10px] text-gray-400 font-bold tracking-wide uppercase">Active Channel</p>
+              <h3 className="font-extrabold text-gray-800 capitalize leading-none mb-1 text-lg">
+                {activeRoom}
+              </h3>
+              <p className="text-[10px] text-gray-400 font-bold tracking-wide uppercase">
+                Active Channel
+              </p>
             </div>
           </div>
           <div className="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-3.5 py-2 rounded-xl border border-indigo-100/30 flex items-center gap-1.5 shadow-sm">
@@ -218,7 +241,10 @@ export const ChatRoom = () => {
           {messages.map((msg) => {
             if (msg.type === "system") {
               return (
-                <div key={msg.id} className="flex justify-center my-2 message-bubble-anim">
+                <div
+                  key={msg.id}
+                  className="flex justify-center my-2 message-bubble-anim"
+                >
                   <span className="px-4 py-1.5 bg-indigo-50/70 text-indigo-700 text-xs font-bold rounded-full border border-indigo-100/30 shadow-sm backdrop-blur-sm">
                     {msg.message}
                   </span>
@@ -235,8 +261,9 @@ export const ChatRoom = () => {
             return (
               <div
                 key={msg.id}
-                className={`flex items-end gap-3 max-w-[85%] ${isMe ? "ml-auto flex-row-reverse" : "mr-auto"
-                  }`}
+                className={`flex items-end gap-3 max-w-[85%] ${
+                  isMe ? "ml-auto flex-row-reverse" : "mr-auto"
+                }`}
               >
                 {/* Avatar */}
                 <div className="flex-shrink-0 mb-1">
@@ -248,7 +275,9 @@ export const ChatRoom = () => {
                     />
                   ) : (
                     <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-indigo-100">
-                      {msg.sender?.name ? msg.sender.name.charAt(0).toUpperCase() : "?"}
+                      {msg.sender?.name
+                        ? msg.sender.name.charAt(0).toUpperCase()
+                        : "?"}
                     </div>
                   )}
                 </div>
@@ -261,16 +290,20 @@ export const ChatRoom = () => {
                     </span>
                   )}
                   <div
-                    className={`px-4 py-1 rounded-3xl text-sm leading-relaxed shadow-sm transition-all duration-300 relative group border ${isMe
-                      ? "bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white rounded-br-none border-indigo-500/10 shadow-indigo-250/20 shadow-md"
-                      : "bg-white text-gray-800 rounded-tl-none border-gray-100 shadow-sm hover:shadow-md"
-                      } message-bubble-anim`}
+                    className={`px-4 py-1 rounded-3xl text-sm leading-relaxed shadow-sm transition-all duration-300 relative group border ${
+                      isMe
+                        ? "bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white rounded-br-none border-indigo-500/10 shadow-indigo-250/20 shadow-md"
+                        : "bg-white text-gray-800 rounded-tl-none border-gray-100 shadow-sm hover:shadow-md"
+                    } message-bubble-anim`}
                   >
-                    <p className="break-words whitespace-pre-wrap font-medium text-xs">{msg.message}</p>
+                    <p className="break-words whitespace-pre-wrap font-medium text-xs">
+                      {msg.message}
+                    </p>
                     <div className="flex items-center justify-end gap-1">
                       <span
-                        className={`text-[9px] font-bold uppercase tracking-wider ${isMe ? "text-indigo-200/80" : "text-gray-400"
-                          }`}
+                        className={`text-[9px] font-bold uppercase tracking-wider ${
+                          isMe ? "text-indigo-200/80" : "text-gray-400"
+                        }`}
                       >
                         {time}
                       </span>
@@ -296,7 +329,9 @@ export const ChatRoom = () => {
               onChange={(e) => setMessageText(e.target.value)}
               disabled={!isConnected}
               placeholder={
-                isConnected ? `Message #${activeRoom}...` : "Connecting to secure channel..."
+                isConnected
+                  ? `Message #${activeRoom}...`
+                  : "Connecting to secure channel..."
               }
               className="w-full bg-gray-50 border border-gray-150 rounded-2xl pl-5 pr-16 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-300 disabled:opacity-50 placeholder-gray-400"
             />
@@ -309,7 +344,7 @@ export const ChatRoom = () => {
           <button
             type="submit"
             disabled={!isConnected || !messageText.trim()}
-            className="p-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-purple-700 hover:to-pink-700 text-white rounded-2xl disabled:opacity-40 transition-all duration-300 shadow-lg shadow-indigo-100 hover:shadow-xl hover:shadow-indigo-250/30 hover:scale-105 active:scale-95 flex items-center justify-center"
+            className="p-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white rounded-2xl disabled:opacity-40 transition-all duration-300 shadow-lg shadow-indigo-100 hover:shadow-xl hover:shadow-indigo-250/30 hover:scale-105 active:scale-95 flex items-center justify-center"
           >
             <Send className="w-5 h-5 transform hover:rotate-12 transition-transform duration-300" />
           </button>
