@@ -51,14 +51,13 @@ export const ChatRoom = () => {
     socket.emit("room:join", { room: roomName });
 
     // 2. Set initial system message for the new room
-    setMessages([
-      {
-        id: `sys_welcome_${Date.now()}`,
-        type: "system",
-        message: `Welcome to #${roomName}! This is the beginning of the channel.`,
-        timestamp: new Date().toISOString(),
-      },
-    ]);
+    const welcomeMsg = {
+      id: `sys_welcome_${Date.now()}`,
+      type: "system",
+      message: `Welcome to #${roomName}! This is the beginning of the channel.`,
+      timestamp: new Date().toISOString(),
+    };
+    setMessages([welcomeMsg]);
 
     // 3. Register listeners
     const handleMessageReceive = (msg) => {
@@ -69,6 +68,26 @@ export const ChatRoom = () => {
 
     const handleRoomJoined = (data) => {
       console.log("Joined confirmation:", data.message);
+    };
+
+    const handleRoomHistory = (data) => {
+      if (data.room === roomName) {
+        setMessages((prev) => {
+          const existingIds = new Set(prev.map((m) => m.id));
+          const historyWithChatType = data.messages
+            .map((msg) => ({ ...msg, type: "chat" }))
+            .filter((msg) => !existingIds.has(msg.id));
+
+          const systemMessages = prev.filter((m) => m.type === "system");
+          const realTimeMessages = prev.filter((m) => m.type === "chat");
+
+          return [
+            ...systemMessages,
+            ...historyWithChatType,
+            ...realTimeMessages,
+          ];
+        });
+      }
     };
 
     const handleUserJoined = (data) => {
@@ -91,6 +110,7 @@ export const ChatRoom = () => {
 
     socket.on("message:receive", handleMessageReceive);
     socket.on("room:joined", handleRoomJoined);
+    socket.on("room:history", handleRoomHistory);
     socket.on("room:user:joined", handleUserJoined);
     socket.on("error:message", handleErrorMessage);
 
@@ -99,6 +119,7 @@ export const ChatRoom = () => {
       socket.emit("room:leave", { room: roomName });
       socket.off("message:receive", handleMessageReceive);
       socket.off("room:joined", handleRoomJoined);
+      socket.off("room:history", handleRoomHistory);
       socket.off("room:user:joined", handleUserJoined);
       socket.off("error:message", handleErrorMessage);
     };
