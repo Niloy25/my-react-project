@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Camera, X, Upload } from "lucide-react";
+import { Camera, X, Upload, User } from "lucide-react";
 import api from "../../utils/axios";
 import toast from "react-hot-toast";
 
@@ -101,6 +101,7 @@ const SingleImageUpload = ({
 
   // Resolve the image source URL
   const currentImage = preview || value || null;
+  const isDefaultGoogleAvatar = currentImage && currentImage.includes("default-user");
 
   return (
     <div className={`flex flex-col items-center gap-4 ${className}`}>
@@ -111,7 +112,7 @@ const SingleImageUpload = ({
         onDrop={handleDrop}
         className={`
           relative w-32 h-32 rounded-full border-2 border-dashed flex flex-col items-center justify-center cursor-pointer overflow-hidden group transition-all duration-300
-          ${isDragOver ? "border-primary-500 bg-primary-50 scale-105" : "border-gray-300 hover:border-primary-500 bg-white"}
+          ${isDragOver ? "border-primary-500 bg-primary-500/10 scale-105" : "border-white/20 hover:border-primary-500 bg-white/10"}
           ${isUploading ? "pointer-events-none opacity-80" : ""}
         `}
       >
@@ -123,7 +124,7 @@ const SingleImageUpload = ({
           className="hidden"
         />
 
-        {currentImage ? (
+        {currentImage && !isDefaultGoogleAvatar ? (
           <>
             <img
               src={currentImage}
@@ -136,9 +137,11 @@ const SingleImageUpload = ({
             </div>
           </>
         ) : (
-          <div className="flex flex-col items-center text-center px-3 text-gray-400 group-hover:text-primary-500">
-            <Camera className="w-8 h-8 mb-1 transition-transform group-hover:scale-110" />
-            <span className="text-xs font-semibold">Upload Image</span>
+          <div className="w-full h-full bg-gradient-to-tr from-sky-400 to-cyan-400 flex flex-col items-center justify-center text-white relative rounded-full">
+            <User className="w-12 h-12 text-white/90" />
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200 rounded-full">
+              <Camera className="w-6 h-6 text-white animate-pulse" />
+            </div>
           </div>
         )}
 

@@ -32,8 +32,8 @@ const imageFilter = (req, file, cb) => {
 
 // General document filter
 const fileFilter = (req, file, cb) => {
-  const allowedExtensions = /jpeg|jpg|png|gif|webp|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|zip|rar/;
-  const allowedMimeTypes = /^(image\/|application\/pdf|application\/msword|application\/vnd.openxmlformats-officedocument|application\/vnd.ms-excel|application\/vnd.openxmlformats-officedocument.spreadsheetml|application\/vnd.ms-powerpoint|application\/vnd.openxmlformats-officedocument.presentationml|text\/plain|application\/zip|application\/x-rar-compressed|application\/x-zip-compressed)/;
+  const allowedExtensions = /jpeg|jpg|png|gif|webp|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|zip|rar|webm|mp3|wav|ogg|m4a/;
+  const allowedMimeTypes = /^(image\/|audio\/|application\/pdf|application\/msword|application\/vnd.openxmlformats-officedocument|application\/vnd.ms-excel|application\/vnd.openxmlformats-officedocument.spreadsheetml|application\/vnd.ms-powerpoint|application\/vnd.openxmlformats-officedocument.presentationml|text\/plain|application\/zip|application\/x-rar-compressed|application\/x-zip-compressed|audio\/webm|audio\/mpeg|audio\/wav|audio\/ogg|audio\/mp4|video\/webm)/;
 
   const extCheck = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
   const mimeCheck = allowedMimeTypes.test(file.mimetype);
@@ -41,7 +41,7 @@ const fileFilter = (req, file, cb) => {
   if (extCheck && mimeCheck) {
     cb(null, true);
   } else {
-    cb(new AppError("Invalid file type. Allowed formats: PDF, Word, Excel, PowerPoint, Text, Images, and Zip/Rar archives.", 400), false);
+    cb(new AppError("Invalid file type. Allowed formats include PDF, Word, Excel, PowerPoint, Text, Images, Audio, and Zip/Rar archives.", 400), false);
   }
 };
 

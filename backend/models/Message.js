@@ -15,10 +15,29 @@ const messageSchema = new mongoose.Schema(
     },
     message: {
       type: String,
-      required: [true, "Message content is required"],
       trim: true,
       maxlength: [1000, "Message cannot exceed 1000 characters"],
     },
+    fileUrl: {
+      type: String,
+      trim: true,
+    },
+    fileType: {
+      type: String,
+      enum: ["image", "file", "audio"],
+      trim: true,
+    },
+    fileName: {
+      type: String,
+      trim: true,
+    },
+    attachments: [
+      {
+        fileUrl: { type: String, required: true },
+        fileType: { type: String, enum: ["image", "file", "audio"], required: true },
+        fileName: { type: String, required: true },
+      }
+    ],
   },
   {
     timestamps: true,

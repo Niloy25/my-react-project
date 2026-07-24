@@ -10,6 +10,8 @@ import {
   selectIsAuthenticated,
   selectIsLoading,
   selectAuthError,
+  verifyOTP,
+  resendOTP,
 } from "../store/authSlice";
 
 // Drop-in replacement for: import { useAuth } from '../context/AuthContext'
@@ -38,6 +40,8 @@ export const useAuth = () => {
     restoreSession: () => dispatch(restoreSession()),
     updateUser: (data) => dispatch(updateUser(data)),
     clearError: () => dispatch(clearError()),
+    verifyOTP: (email, otp) => dispatch(verifyOTP({ email, otp })).unwrap(),
+    resendOTP: (email) => dispatch(resendOTP({ email })).unwrap(),
   };
 };
 

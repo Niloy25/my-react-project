@@ -18,7 +18,7 @@ const Input = forwardRef(({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-350 mb-1"
         >
           {label}
         </label>
@@ -34,14 +34,14 @@ const Input = forwardRef(({
           type={type}
           ref={ref}
           className={`
-            w-full px-4 py-2.5 border rounded-xl text-sm transition-all duration-200 bg-white
-            focus:outline-none focus:ring-2 focus:border-transparent placeholder-gray-400
+            w-full px-4 py-2.5 border rounded-xl text-sm transition-all duration-200 bg-white/[0.04]
+            focus:outline-none focus:ring-2 focus:ring-primary-500/20 placeholder-gray-500
             ${icon ? "pl-10" : ""}
             ${suffix ? "pr-10" : ""}
             ${
               error
-                ? "border-red-400 focus:ring-red-400 text-red-900 placeholder-red-300"
-                : "border-gray-300 focus:ring-primary-500 focus:border-transparent text-gray-900"
+                ? "border-red-500 focus:ring-red-500/20 text-red-400 placeholder-red-300/50"
+                : "border-white/10 focus:border-primary-500 text-white"
             }
             ${className}
           `}

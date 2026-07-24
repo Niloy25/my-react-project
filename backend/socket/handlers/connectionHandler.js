@@ -1,4 +1,5 @@
 const logger = require("../../config/logger");
+const User = require("../../models/User");
 
 /**
  * connectionHandler
@@ -10,7 +11,7 @@ const logger = require("../../config/logger");
  * @param {Map}    onlineUsers  Map<userId, Set<socketId>>
  */
 
-const connectionHandler = (io, socket, onlineUsers) => {
+const connectionHandler = async (io, socket, onlineUsers) => {
   const userId = socket.user._id.toString();
   const userName = socket.user.name;
 
@@ -23,10 +24,14 @@ const connectionHandler = (io, socket, onlineUsers) => {
   // Only announce online on FIRST connection
   // (not when user opens a second tab — they were already online)
   if (onlineUsers.get(userId).size === 1) {
+    const dbUser = await User.findById(userId).select("isPremium");
+    const isPremium = dbUser ? dbUser.isPremium : false;
+
     io.emit("user:online", {
       userId,
       name: userName,
       avatar: socket.user.profilePicture || "",
+      isPremium,
     });
     logger.info(`User came online: ${userName} (${userId})`);
   }
@@ -37,16 +42,19 @@ const connectionHandler = (io, socket, onlineUsers) => {
     const firstSocketId = Array.from(socketIds)[0];
     const userSocket = io.sockets.sockets.get(firstSocketId);
     if (userSocket && userSocket.user) {
+      const dbUser = await User.findById(userSocket.user._id).select("isPremium");
       onlineList.push({
         userId: id,
         name: userSocket.user.name,
         avatar: userSocket.user.profilePicture || "",
+        isPremium: dbUser ? dbUser.isPremium : false,
       });
     } else {
       onlineList.push({
         userId: id,
         name: "User",
         avatar: "",
+        isPremium: false,
       });
     }
   }
@@ -62,3 +70,4 @@ const connectionHandler = (io, socket, onlineUsers) => {
 };
 
 module.exports = connectionHandler;
+
