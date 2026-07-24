@@ -29,8 +29,9 @@ export const SocketProvider = ({ children }) => {
     const token = getAccessToken();
     if (!token) return;
 
-    // Connect to Socket.IO server (using the Vite proxy)
-    const socket = io({
+    // Connect to Socket.IO server
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || undefined;
+    const socket = io(backendUrl, {
       auth: { token },
       autoConnect: true,
       reconnectionAttempts: 5,

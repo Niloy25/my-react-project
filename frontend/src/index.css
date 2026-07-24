@@ -130,7 +130,7 @@ code {
 
   body {
     font-family: var(--font-sans);
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-[#070a13] text-white antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -148,17 +148,19 @@ code {
 
 @layer components {
   .input {
-    @apply w-full px-4 py-2.5 border border-gray-300 rounded-xl
-           text-sm focus:outline-none focus:ring-2 focus:ring-primary-500
+    @apply w-full px-4 py-2.5 border border-white/10 rounded-xl
+           text-sm focus:outline-none focus:ring-2 focus:ring-sky-500
            focus:border-transparent transition-all duration-200
-           placeholder-gray-400 bg-white;
+           placeholder-gray-500 bg-white/[0.04] text-white;
   }
 
   .btn-primary {
-    @apply w-full py-3 px-4 bg-primary-600 text-white font-medium
-           rounded-xl hover:bg-primary-700 focus:outline-none 
-           focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 
+    @apply w-full py-3 px-4 bg-sky-500 text-white font-medium
+           rounded-xl hover:bg-sky-600 focus:outline-none 
+           focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 
            transition-all duration-200 disabled:opacity-60 
            disabled:cursor-not-allowed text-base;
   }
 }
+
+/* Rebuild trigger: Electric Blue and Cyan Theme Applied */

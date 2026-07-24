@@ -23,7 +23,12 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: [
+        function () {
+          return !this.googleId && !this.facebookId;
+        },
+        "Password is required",
+      ],
       minlength: [8, "Password must be at least 8 characters"],
       select: false,
     },
@@ -37,6 +42,11 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
     isVerified: { type: Boolean, default: false },
+    verificationOTP: { type: String, default: null },
+    verificationOTPExpires: { type: Date, default: null },
+    googleId: { type: String, unique: true, sparse: true },
+    facebookId: { type: String, unique: true, sparse: true },
+    isPremium: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     refreshTokens: [
       {
@@ -57,6 +67,7 @@ userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 
 userSchema.virtual("initials").get(function () {
+  if (!this.name) return "U";
   return this.name
     .split(" ")
     .map((n) => n[0])

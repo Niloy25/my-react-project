@@ -1,0 +1,20 @@
+{
+  "ignore": [
+    "logs/*",
+    "uploads/*",
+    "node_modules/*",
+    "*.log",
+    "check_users.js",
+    "check_indexes.js"
+  ],
+  "watch": [
+    "controllers/*",
+    "models/*",
+    "routes/*",
+    "middleware/*",
+    "utils/*",
+    "config/*",
+    "server.js"
+  ],
+  "ext": "js,json"
+}

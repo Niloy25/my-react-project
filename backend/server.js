@@ -32,6 +32,7 @@ app.use(
 );
 
 // ── General Middleware ────────────────────────────────────
+app.use("/api/payments/webhook", express.raw({ type: "application/json" }));
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -68,6 +69,7 @@ app.get("/health", (_req, res) => {
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/uploads", require("./routes/uploadRoutes"));
+app.use("/api/payments", require("./routes/paymentRoutes"));
 
 // ── 404 ───────────────────────────────────────────────────
 app.use((_req, res) => {
@@ -81,6 +83,7 @@ app.use(errorHandler);
 const io = initSocket(server);
 app.set("io", io);
 
+// Force nodemon restart to load socket handlers updates (v2)
 // ── Start Server ──────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
@@ -97,8 +100,15 @@ process.on("SIGTERM", () => {
 });
 
 process.on("unhandledRejection", (err) => {
-  logger.error(`Unhandled Rejection: ${err.message}`);
+  logger.error(`Unhandled Rejection: ${err.message}`, { stack: err.stack });
+  server.close(() => process.exit(1));
+});
+
+process.on("uncaughtException", (err) => {
+  logger.error(`Uncaught Exception: ${err.message}`, { stack: err.stack });
   server.close(() => process.exit(1));
 });
 
 module.exports = { app, server };
+// Trigger nodemon reload
+

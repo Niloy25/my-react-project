@@ -5,7 +5,11 @@ import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
+import OAuthSuccess from "./pages/OAuthSuccess";
 import DashboardPage from "./pages/DashboardPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PaymentCancelPage from "./pages/PaymentCancelPage";
 import { SocketProvider } from "./context/SocketContext";
 
 const App = () => {
@@ -31,10 +35,14 @@ const App = () => {
           {/* Public routes */}
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/oauth-success" element={<OAuthSuccess />} />
 
           {/* Protected routes — wrap in PrivateRoute */}
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/payment-success" element={<PaymentSuccessPage />} />
+            <Route path="/payment-cancel" element={<PaymentCancelPage />} />
           </Route>
 
           {/* Redirect root to dashboard (PrivateRoute will handle redirect to login) */}

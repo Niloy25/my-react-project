@@ -5,6 +5,7 @@ const logger = require("../config/logger");
 const connectionHandler = require("./handlers/connectionHandler");
 const chatHandler = require("./handlers/chatHandler");
 const notificationHandler = require("./handlers/notificationHandler");
+const { callHandler, handleCallDisconnect } = require("./handlers/callHandler");
 
 // Track online users: userId -> Set of socketIds
 // Using Set so one user can have multiple tabs open
@@ -61,10 +62,14 @@ const initSocket = (server) => {
     connectionHandler(io, socket, onlineUsers);
     chatHandler(io, socket);
     notificationHandler(io, socket, onlineUsers);
+    callHandler(io, socket);
 
     // ── Disconnect ──────────────────────────────────────────────────────────
     socket.on("disconnect", (reason) => {
       logger.info(`Socket disconnected: ${socket.user.name} — ${reason}`);
+
+      // Clean up any active call connections for this socket
+      handleCallDisconnect(io, socket);
 
       const userId = socket.user._id.toString();
       const userSockets = onlineUsers.get(userId);

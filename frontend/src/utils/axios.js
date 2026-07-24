@@ -12,8 +12,10 @@ export const clearAccessToken = () => {
 };
 
 // ── Axios instance ────────────────────────────────────────
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: `${backendUrl}/api`,
   withCredentials: true, // send httpOnly cookie on every request
   headers: { "Content-Type": "application/json" },
 });
@@ -73,7 +75,7 @@ api.interceptors.response.use(
       try {
         // Call refresh endpoint — uses httpOnly cookie automatically
         const { data } = await axios.post(
-          "/api/auth/refresh",
+          `${backendUrl}/api/auth/refresh`,
           {},
           { withCredentials: true },
         );
