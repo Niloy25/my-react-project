@@ -26,7 +26,8 @@ const LoginPage = () => {
   });
 
   const handleSocialLogin = (provider) => {
-    window.location.href = `/api/auth/${provider}`;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    window.location.href = `${backendUrl}/api/auth/${provider}`;
   };
 
   const mutation = useMutation({
