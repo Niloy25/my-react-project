@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 const VerifyEmailPage = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
+  const mockOtp = searchParams.get("mockOtp") || "";
   const navigate = useNavigate();
   const { verifyOTP, resendOTP } = useAuth();
 
@@ -24,6 +25,17 @@ const VerifyEmailPage = () => {
       navigate("/signup");
     }
   }, [email, navigate]);
+
+  // Auto-fill mock OTP in development mode
+  useEffect(() => {
+    if (mockOtp && /^\d{6}$/.test(mockOtp)) {
+      setOtp(mockOtp.split(""));
+      toast.info(`[Dev Mode] Automatically filled verification code: ${mockOtp}`, {
+        duration: 10000,
+        id: "mock-otp-fill",
+      });
+    }
+  }, [mockOtp]);
 
   // Countdown timer for Resend OTP
   useEffect(() => {
@@ -98,12 +110,20 @@ const VerifyEmailPage = () => {
     if (!canResend) return;
 
     try {
-      await resendOTP(email);
+      const resData = await resendOTP(email);
       toast.success("Verification code resent to your email");
+      if (resData?.mockOtp) {
+        setOtp(resData.mockOtp.split(""));
+        toast.info(`[Dev Mode] Automatically filled verification code: ${resData.mockOtp}`, {
+          duration: 10000,
+          id: "mock-otp-fill",
+        });
+      } else {
+        setOtp(["", "", "", "", "", ""]);
+        inputRefs.current[0].focus();
+      }
       setResendTimer(60);
       setCanResend(false);
-      setOtp(["", "", "", "", "", ""]);
-      inputRefs.current[0].focus();
     } catch (err) {
       const msg = err.response?.data?.message || err.message || "Failed to resend code";
       toast.error(msg);

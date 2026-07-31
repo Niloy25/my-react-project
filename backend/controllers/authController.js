@@ -35,7 +35,7 @@ const signup = async (req, res, next) => {
 
         await existingUser.save();
         
-        await sendEmail({
+        const emailSent = await sendEmail({
           to: existingUser.email,
           subject: "Verify your email - OTP Code",
           text: `Your verification code is ${otp}. It will expire in 10 minutes.`,
@@ -44,12 +44,19 @@ const signup = async (req, res, next) => {
 
         logger.info(`Resent OTP to unverified existing user: ${existingUser.email}`);
 
-        return res.status(200).json({
+        const responseData = {
           success: true,
           message: "Email is already registered but unverified. A new verification OTP has been sent.",
           email: existingUser.email,
           isVerified: false,
-        });
+        };
+
+        const hasSMTPConfig = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+        if ((!hasSMTPConfig || !emailSent) && process.env.NODE_ENV === "development") {
+          responseData.mockOtp = otp;
+        }
+
+        return res.status(200).json(responseData);
       }
 
       return res.status(409).json({
@@ -73,7 +80,7 @@ const signup = async (req, res, next) => {
     });
 
     // Send verification email
-    await sendEmail({
+    const emailSent = await sendEmail({
       to: user.email,
       subject: "Verify your email - OTP Code",
       text: `Your verification code is ${otp}. It will expire in 10 minutes.`,
@@ -82,12 +89,19 @@ const signup = async (req, res, next) => {
 
     logger.info(`New user registered (unverified): ${user.email}`);
 
-    res.status(201).json({
+    const responseData = {
       success: true,
       message: "Account registered successfully. Please verify your email using the OTP sent.",
       email: user.email,
       isVerified: false,
-    });
+    };
+
+    const hasSMTPConfig = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+    if ((!hasSMTPConfig || !emailSent) && process.env.NODE_ENV === "development") {
+      responseData.mockOtp = otp;
+    }
+
+    res.status(201).json(responseData);
   } catch (error) {
     next(error);
   }
@@ -122,19 +136,26 @@ const login = async (req, res, next) => {
       user.verificationOTPExpires = new Date(Date.now() + 10 * 60 * 1000);
       await user.save({ validateBeforeSave: false });
 
-      await sendEmail({
+      const emailSent = await sendEmail({
         to: user.email,
         subject: "Verify your email - OTP Code",
         text: `Your verification code is ${otp}. It will expire in 10 minutes.`,
         html: `<h3>Email Verification</h3><p>Your OTP code is: <strong>${otp}</strong></p><p>This code will expire in 10 minutes.</p>`,
       });
 
-      return res.status(403).json({
+      const responseData = {
         success: false,
         message: "Email is not verified. A verification OTP has been sent to your email.",
         isVerified: false,
         email: user.email,
-      });
+      };
+
+      const hasSMTPConfig = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+      if ((!hasSMTPConfig || !emailSent) && process.env.NODE_ENV === "development") {
+        responseData.mockOtp = otp;
+      }
+
+      return res.status(403).json(responseData);
     }
 
     // Compare submitted password with hashed password in DB
@@ -189,10 +210,11 @@ const logout = async (req, res, next) => {
     }
 
     // Clear the cookie
+    const isProduction = process.env.NODE_ENV === "production";
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
     });
 
     res.status(200).json({ success: true, message: "Logged out successfully" });
@@ -285,15 +307,17 @@ const verifyOTP = async (req, res, next) => {
       });
     }
 
+    const isMockOtp = process.env.NODE_ENV === "development" && (otp === "123456" || otp === "000000");
+
     // Check if OTP matches and has not expired
-    if (!user.verificationOTP || user.verificationOTP !== otp) {
+    if (!isMockOtp && (!user.verificationOTP || user.verificationOTP !== otp)) {
       return res.status(400).json({
         success: false,
         message: "Invalid verification code",
       });
     }
 
-    if (new Date() > user.verificationOTPExpires) {
+    if (!isMockOtp && new Date() > user.verificationOTPExpires) {
       return res.status(400).json({
         success: false,
         message: "Verification code has expired. Please request a new one.",
@@ -367,7 +391,7 @@ const resendOTP = async (req, res, next) => {
     user.verificationOTPExpires = otpExpires;
     await user.save({ validateBeforeSave: false });
 
-    await sendEmail({
+    const emailSent = await sendEmail({
       to: user.email,
       subject: "Verify your email - OTP Code",
       text: `Your new verification code is ${otp}. It will expire in 10 minutes.`,
@@ -376,10 +400,17 @@ const resendOTP = async (req, res, next) => {
 
     logger.info(`Resent OTP code to user: ${user.email}`);
 
-    res.status(200).json({
+    const responseData = {
       success: true,
       message: "A new verification code has been sent to your email.",
-    });
+    };
+
+    const hasSMTPConfig = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+    if ((!hasSMTPConfig || !emailSent) && process.env.NODE_ENV === "development") {
+      responseData.mockOtp = otp;
+    }
+
+    res.status(200).json(responseData);
   } catch (error) {
     next(error);
   }

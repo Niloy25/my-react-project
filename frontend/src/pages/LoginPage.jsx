@@ -43,7 +43,9 @@ const LoginPage = () => {
 
       if (err.response?.status === 403 && err.response?.data?.isVerified === false) {
         toast.error(msg);
-        navigate(`/verify-email?email=${encodeURIComponent(err.response.data.email)}`);
+        const mockOtp = err.response.data.mockOtp;
+        const otpQuery = mockOtp ? `&mockOtp=${mockOtp}` : "";
+        navigate(`/verify-email?email=${encodeURIComponent(err.response.data.email)}${otpQuery}`);
       } else if (err.response?.status === 401) {
         setError("password", {
           type: "manual",
