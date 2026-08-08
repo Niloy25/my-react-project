@@ -15,6 +15,7 @@ const errorHandler = require("./middleware/errorHandler");
 const { initSocket } = require("./socket/index");
 
 const app = express();
+app.set("trust proxy", 1); // Trust Render's reverse proxy to get correct https protocol
 const server = http.createServer(app);
 
 // ── Database ──────────────────────────────────────────────
@@ -110,5 +111,3 @@ process.on("uncaughtException", (err) => {
 });
 
 module.exports = { app, server };
-// Trigger nodemon reload
-

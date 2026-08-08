@@ -1,6 +1,6 @@
 // src/store/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api, { setAccessToken, clearAccessToken } from "../utils/axios";
+import api, { setAccessToken, getAccessToken, clearAccessToken } from "../utils/axios";
 
 // ── Async Thunks (replaces login/signup/logout functions from AuthContext) ──
 
@@ -86,9 +86,11 @@ export const restoreSession = createAsyncThunk(
   "auth/restoreSession",
   async (_, { rejectWithValue }) => {
     try {
-      // Use refresh token cookie to get new access token
-      const { data: refreshData } = await api.post("/auth/refresh");
-      setAccessToken(refreshData.accessToken);
+      // If we don't have an access token in memory, try to get one using refresh token cookie
+      if (!getAccessToken()) {
+        const { data: refreshData } = await api.post("/auth/refresh");
+        setAccessToken(refreshData.accessToken);
+      }
 
       // Fetch user profile
       const { data: meData } = await api.get("/users/me");

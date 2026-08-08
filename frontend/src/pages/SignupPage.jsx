@@ -83,7 +83,8 @@ const SignupPage = () => {
 
     onSuccess: (resData) => {
       toast.success("Verification OTP sent to your email!");
-      navigate(`/verify-email?email=${encodeURIComponent(resData.email)}`);
+      const mockOtpQuery = resData.mockOtp ? `&mockOtp=${resData.mockOtp}` : "";
+      navigate(`/verify-email?email=${encodeURIComponent(resData.email)}${mockOtpQuery}`);
     },
 
     onError: (err) => {
