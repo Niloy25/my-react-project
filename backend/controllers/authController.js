@@ -609,7 +609,7 @@ const facebookLogin = (req, res) => {
     return res.redirect(callbackUrl);
   }
 
-  const rootUrl = "https://www.facebook.com/v12.0/dialog/oauth";
+  const rootUrl = "https://www.facebook.com/v20.0/dialog/oauth";
   const callbackUrl = `${req.protocol}://${req.get("host")}/api/auth/facebook/callback`;
   const options = {
     client_id: process.env.FACEBOOK_APP_ID,
@@ -662,7 +662,7 @@ const facebookCallback = async (req, res, next) => {
     } else {
       const callbackUrl = `${req.protocol}://${req.get("host")}/api/auth/facebook/callback`;
       // 1. Exchange code for access token
-      const tokenUrl = "https://graph.facebook.com/v12.0/oauth/access_token";
+      const tokenUrl = "https://graph.facebook.com/v20.0/oauth/access_token";
       const tokenParams = {
         client_id: process.env.FACEBOOK_APP_ID,
         client_secret: process.env.FACEBOOK_APP_SECRET,
