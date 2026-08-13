@@ -75,17 +75,17 @@ const Navbar = () => {
                     <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-400 to-cyan-400 text-white flex items-center justify-center text-xs font-semibold shadow-sm">
                       {user.name
                         ? user.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase()
-                            .slice(0, 2)
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
+                          .slice(0, 2)
                         : "U"}
                     </div>
                   )}
 
                   {/* User name & VIP badge */}
-                  <div className="flex items-center gap-1.5 hidden sm:flex text-left">
+                  <div className="flex items-center gap-1.5 sm:flex text-left">
                     <span className="text-sm text-gray-200 font-semibold max-w-[120px] truncate">
                       {user.name}
                     </span>
@@ -98,7 +98,7 @@ const Navbar = () => {
                       </span>
                     )}
                   </div>
-                  
+
                   <ChevronDown className="w-4 h-4 text-gray-400 hidden sm:block mr-1" />
                 </button>
 
@@ -120,7 +120,7 @@ const Navbar = () => {
                           animation: slideInDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
                         }
                       `}</style>
-                      
+
                       {/* Header details inside dropdown for mobile/responsive */}
                       <div className="px-4 py-2 border-b border-white/[0.06] sm:hidden">
                         <p className="text-[10px] text-gray-400 font-medium">Signed in as</p>
